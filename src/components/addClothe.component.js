@@ -9,6 +9,57 @@ import { IoMdPin } from "react-icons/io";
 import apiCaller from "../utils/apiCaller";
 
 export default class AddClothe extends Component{
+    constructor(props){
+        super(props);
+        this.state={
+            name:"",
+            price:"",
+            image:"",
+            status:true,
+            quantity:5,
+            description:"",
+        }
+    }
+    // generate random id
+    uuidv4() {
+        return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+    }
+    
+    onChange = (event)=>{
+        var target = event.target;
+        var value = target.value;
+        var name = target.name;
+        if(name === "status"){
+            value = target.value === "true"? true : false;
+        }
+        this.setState({
+            [name] : value
+        })
+    }
+
+    onSubmit = (event)=>{
+        event.preventDefault();
+        var {name,price,image,status,quantity,description} = this.state;
+        var {history} = this.props;
+        apiCaller('api/addProduct','POST',{
+            name:name,
+            price:price,
+            image:image,
+            status:status,
+            quantity:quantity,
+            description:description,
+
+        })
+            .then((res)=>{
+                console.log(res);
+                // history.push('/')
+                // redirect về trang trước đó
+                history.goBack()}
+            );
+    }
+
     render(){
         return(
             <div className="site-wrap">
@@ -29,33 +80,33 @@ export default class AddClothe extends Component{
                     <p>Products</p>
 
                     <div style={{width:"600px",marginLeft:"200px"}}>
-                        <Form >
+                        <Form onSubmit={this.onSubmit}>
                             <FormGroup>
                                 <Label >Tên sản phẩm : </Label>
-                                <Input type="text" name="name" />
+                                <Input type="text" onChange={this.onChange} name="name" />
                             </FormGroup>
 
                             <FormGroup>
                                 <Label >Giá : </Label>
-                                <Input type="number" name="price" />
+                                <Input type="number" onChange={this.onChange} name="price" />
                             </FormGroup>
 
                             <FormGroup>
                                 <Label >Tình trạng : </Label>
-                                <select name="status" >
-                                    <option >Còn hàng</option>
-                                    <option >Hết hàng</option>
+                                <select name="status" value={this.state.status} onChange={this.onChange}>
+                                    <option value={true}>Còn hàng</option>
+                                    <option value={false}>Hết hàng</option>
                                 </select>
                             </FormGroup>
 
                             <FormGroup>
                                 <Label >Số lượng : </Label>
-                                <Input type="number" name="quantity" />
+                                <Input type="number" onChange={this.onChange} name="quantity" />
                             </FormGroup>
                             
                             <FormGroup>
                                 <Label >Chi tiết sản phẩm : </Label>
-                                <Input type="text" name="description"  />
+                                <Input type="text" onChange={this.onChange} name="description"  />
                             </FormGroup>
 
                             {/* <FormGroup tag="fieldset">

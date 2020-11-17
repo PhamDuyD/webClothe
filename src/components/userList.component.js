@@ -9,7 +9,86 @@ import { get } from 'jquery';
 
 
 export default class UserList extends Component{
+    constructor(props){
+        super(props); 
+
+        this.state = {
+            token:"",
+            userList : []
+        }
+    }
+
+    componentDidMount(){
+        apiCaller('api/user','GET',null)
+            .then((res)=>{
+                var getToken =localStorage.getItem("token");
+                this.setState({
+                    token:getToken,
+                    userList : res.data //data = {_id,name,image,status,quantity,description}
+                });
+                console.log(this.state.userList);
+            });
+        // localStorage.getItem("token");
+    }
+
+
+    onDelete = (_id)=>{
+        var {userList} = this.state;
+        var {history} = this.props;
+        apiCaller(`api/deleteUser/${_id}`,'DELETE',null)
+            .then((res)=>{
+                if(res.status === 200){ //ok
+                    var index = this.findIndex(userList,_id);
+                    if(index !== -1){
+                        userList.slice(index,1); // find index of product in producList[] and cut 1 value
+                        this.state({
+                            userList:userList
+                        });
+                    }
+                }
+            });
+            // history.goBack();
+            console.log('delete product success');
+    }
+
+    findIndex = (userList,_id)=>{
+        var result = -1;
+        userList.forEach((value,index) => {
+            if(value._id === _id){
+                result = index;
+            }
+        });
+
+        return result;
+    }
+
+
     render(){
+
+        var {userList,isLogin,token} = this.state;
+        var elementUser = userList.map((value,index)=>(
+                <tr key={index}>
+                    <th scope="row">{index}</th>
+                    <td>{value.name}</td>
+                    <td>{value.phone}</td>
+                    <td>{value.address}</td>
+                    <td>{value.age}</td>
+                    <td><span className={value.status === true?'badge badge-primary' : 'badge badge-dark'}>{value.gender === true?"Nam":"Nữ"}</span></td>
+                    <td><img src={value.image} style={{width:'100px',height:'100px'}}/></td>
+                    <td>{value.email}</td>
+                    <td>{value.password}</td>
+                    <td >
+                        <div className="row">
+                                <div className="col-3"><Button color="warning"><Link to={`/${value._id}/editUser`}><FaEdit/></Link></Button></div>
+                                <div className="col-3"></div>
+                                <div className="col-3"><Button color="danger" onClick={()=>{this.onDelete(value._id)}} ><FaTrashAlt/></Button></div>
+                        </div>
+                    </td>
+                </tr>
+        ));
+        if(token === null){
+            return <Redirect to="/home"/>
+        };
 
         return(
             <div>
@@ -41,6 +120,7 @@ export default class UserList extends Component{
                                 </tr>
                             </thead>
                             <tbody >
+                                {elementUser}
                             </tbody>
                         </table>
                         </div>

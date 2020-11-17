@@ -10,7 +10,80 @@ import { BiSearch } from "react-icons/bi";
 import { IoMdPin } from "react-icons/io";
 
 export default class Login extends Component{
+    constructor(props){
+        super(props);
+        
+        const token = localStorage.getItem("token");
+        let isLogin = false;
+
+        if(token == null){
+           isLogin = false
+        }
+
+
+        this.state = {
+            email: "",
+            password: "",
+            token:"",
+            isLogin,
+            userList : []
+        }
+    }
+
+    componentDidMount(){
+        apiCaller('api/user','GET',null)
+            .then(res=>{
+                this.setState({
+                   userList:res.data
+                })
+                console.log(this.state.userList);
+            });
+    }
+
+    onChange = (event)=>{
+        var target = event.target;
+        var value = target.value;
+        var name = target.name;
+        // if(name === "gender"){
+        //     value = target.value === "true"? true : false;
+        // }
+        this.setState({
+            [name] : value
+        })
+    }
+
+    onSubmit = (e)=>{
+        e.preventDefault();
+        var {userList,email,password,isLogin} = this.state;
+        userList.forEach((value,index)=>{
+            if(value.email === email && value.password === password){
+                this.setState({
+                    isLogin:true
+                })
+                // Is Admin
+                if(email === "admin@gmail.com"){
+                    this.setState({
+                        isLogin:true
+                    })
+
+                    localStorage.setItem('token',"iwkeubf29ho2fohefh29h");
+                    // localStorage.setItem('user',JSON.stringify());
+                }
+            }
+            // else if(){
+            //     return alert("Your email or password is wrong. Please try angain !");
+            // }
+        })
+    }
+
     render(){
+        if(this.state.isLogin){
+            // if(this.state.token === "iwkeubf29ho2fohefh29h"){
+            //     return <Redirect to="/userList"/>
+            // }
+            return <Redirect to="/userList"/>
+        }
+
         return(
             <div className="site-wrap">
                 {/* login */}
@@ -36,14 +109,14 @@ export default class Login extends Component{
                         <div className="signup__overlay" />
                     </div>
                     <div className="container__child signup__form">
-                        <form action="#">
+                        <form action="#" onSubmit={this.onSubmit}>
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
-                            <input className="form-control" type="text" name="email" id="email" placeholder="Your email" required />
+                            <input className="form-control" type="text" onChange={this.onChange} name="email" id="email" placeholder="Your email" required />
                         </div>
                         <div className="form-group">
                             <label htmlFor="password">Password</label>
-                            <input className="form-control" type="password" name="password" id="password" placeholder="********" required />
+                            <input className="form-control" type="password" onChange={this.onChange} name="password" id="password" placeholder="********" required />
                         </div>
                         <div className="m-t-lg">
                             <ul className="list-inline">

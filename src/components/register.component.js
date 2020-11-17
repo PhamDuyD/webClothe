@@ -10,6 +10,56 @@ import { BiSearch } from "react-icons/bi";
 import { IoMdPin } from "react-icons/io";
 
 export default class Register extends Component{
+    constructor(props){
+        super(props);
+        this.state={
+            name:"",
+            phone:"",
+            address:"",
+            age:6,
+            gender:true,
+            image: "",
+            email: "",
+            password: "",
+        }
+    }
+
+    onChange = (event)=>{
+        var target = event.target;
+        var value = target.value;
+        var name = target.name;
+        if(name === "gender"){
+            value = target.value === "true"? true : false;
+        }
+        this.setState({
+            [name] : value
+        })
+    }
+
+    onSubmit = (event)=>{
+        event.preventDefault();
+        var {name,phone,address,age,gender,image,email,password} = this.state;
+        var {history} = this.props;
+        apiCaller('api/addUser','POST',{
+            name:name,
+            phone:phone,
+            address:address,
+            age:age,
+            gender:gender,
+            image:image,
+            email:email,
+            password:password,
+
+        })
+            .then((res)=>{
+                console.log(res);
+                // history.push('/')
+                // redirect về trang trước đó
+                history.goBack()}
+            );
+    }
+
+
     render(){
         return(
             <div className="site-wrap">
@@ -36,22 +86,22 @@ export default class Register extends Component{
                         <div className="signup__overlay" />
                     </div>
                     <div className="container__child signup__form">
-                        <Form action="#" >
+                        <Form action="#" onSubmit={this.onSubmit}>
                         <div className="form-group">
                             <label htmlFor="username">Username</label>
-                            <input className="form-control" type="text"  name="name" id="username" placeholder="james.bond" required />
+                            <input className="form-control" type="text" onChange={this.onChange} name="name" id="username" placeholder="james.bond" required />
                         </div>
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
-                            <input className="form-control" type="text"  name="email" id="email" placeholder="james.bond@spectre.com" required />
+                            <input className="form-control" type="text" onChange={this.onChange} name="email" id="email" placeholder="james.bond@spectre.com" required />
                         </div>
                         <div className="form-group">
                             <label htmlFor="password">Password</label>
-                            <input className="form-control" type="password"  name="password" id="password" placeholder="********" required />
+                            <input className="form-control" type="password" onChange={this.onChange} name="password" id="password" placeholder="********" required />
                         </div>
                         <div className="form-group">
                             <label htmlFor="passwordRepeat">Repeat Password</label>
-                            <input className="form-control" type="password"  name="passwordRepeat" id="passwordRepeat" placeholder="********" required />
+                            <input className="form-control" type="password" onChange={this.onChange} name="passwordRepeat" id="passwordRepeat" placeholder="********" required />
                         </div>
                         <div className="m-t-lg">
                             <ul className="list-inline">

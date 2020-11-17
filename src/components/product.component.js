@@ -12,8 +12,78 @@ import {CartContext} from "../contexts/cart";
 
 
 export default class Product extends Component{
+    constructor(props){
+        super(props);
+
+        const token = localStorage.getItem("token");
+        
+        let isLogin = true;
+
+        if(token == null){
+            this.setState.isLogin = false
+        }else{
+            this.setState.isLogin = true
+        }
+        
+        this.state={
+            
+            token:"",
+            isLogin,
+            productList : []
+        }
+    }
+    
+    
+    componentDidMount(){
+        apiCaller('api/Product','GET',null)
+            .then((res)=>{
+                this.setState({
+                    productList:res.data
+                });
+            });
+    }
+    
+    // componentDidMount(){
+    //     console.log("componentDidMount");
+    //     // kiểm tra xem localStorage có khác null ko và có lấy đc key ko 
+    //     if(localStorage && localStorage.getItem("product") ) {
+    //         var product = JSON.parse(localStorage.getItem("product"));
+    //         console.log("componentDidMount lần 2 refresh check productList đã lưu data chưa");
+    //         console.log(this.state.productList);
+    //         this.setState({
+    //             productList:this.state.productList.push(product)
+    //         })
+    //         console.log("check type of productList");
+    //         console.log(typeof this.state.productList);
+    //     }
+        
+
+    // }
+
+
+
     render(){
         
+        const {productList} = this.state;
+        var elementProduct = productList.map((value,key)=>(
+            
+            <div className="col-sm-6 col-lg-4 mb-4" >
+                <div className="block-4 text-center border">
+                    <figure className="block-4-image">
+                        <a href="shop-single.html"><img src={value.image} alt="Image placeholder" className="img-fluid" /></a>
+                    </figure>
+                    <div className="block-4-text p-4">
+                        <h3><Link to="/infoClothe/">{value.name}</Link></h3>
+                        <p className="mb-0">{value.description}</p>
+                        <p className="text-primary font-weight-bold">{value.price}</p>
+                    </div>
+                    <CartContext.Consumer>
+                        {({addToCart})=><Button color="primary" onClick={()=>addToCart(value)} className="btn  btn-sm btn-block">Add To Cart</Button>}
+                    </CartContext.Consumer>
+                </div>
+            </div>
+    ));
+            
     
         return(
             <div className="site-wrap">
@@ -64,6 +134,7 @@ export default class Product extends Component{
                             
                             <div className="row mb-5">
 
+                            {elementProduct}
                             </div>
                                 
                             {/* end list product */}
