@@ -1,0 +1,3 @@
+Đỗ Phạm Duy : function , data
+Lê Thị Huyền : server
+Nguyễn Minh Tuấn : front-end
